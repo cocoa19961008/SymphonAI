@@ -12,6 +12,8 @@ def setup(args):
     os.makedirs("env", exist_ok=True)
     os.makedirs("src", exist_ok=True)
 
+    open("global.env", "w").close()
+
     docker.build_mosquitto()
     docker.build_nginx()
 
@@ -32,7 +34,8 @@ def create(args):
     with open(f"{pkg_dir}/config.json", "w") as f:
         json.dump({
             "env": args.env,
-        }, f)
+            "options": {},
+        }, f, indent=4)
 
 def build(args):
     for dockerfile in os.listdir("env"):
@@ -44,16 +47,18 @@ def build(args):
 
     services = dict()
     for pkg, config in pkgs.items():
-        services[pkg] = {
+        services[pkg] = config["options"]
+        services[pkg].update({
             "image": f"sym/{currentdir}:{config['env']}",
             "volumes": [f"{os.getcwd()}/src/{pkg}:/node"],
             "networks": [currentdir],
             "depends_on": ["mosquitto"],
-        }
+            "env_file": [f"{os.getcwd()}/global.env", f"{os.getcwd()}/src/{pkg}/params.env"],
+        })
 
     services["mosquitto"] = {
         "image": "symphonai/mosquitto",
-            "networks": [currentdir],
+        "networks": [currentdir],
     }
 
     with open(".sym/docker-compose.yml", "w") as f:

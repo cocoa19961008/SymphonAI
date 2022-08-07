@@ -48,7 +48,7 @@ class Client(mqtt.Client):
         name = f"syncs/{name}"
 
         def setter(value):
-            self.publish(name, value)
+            self.publish(name, value, qos=1, retain=True)
         self.syncs[name] = sync.Sync(name, value, setter)
         @self.subscribe(name)
         def sync_callback(message):
@@ -63,7 +63,7 @@ class Client(mqtt.Client):
 
         def cb(msg):
             args = json.loads(msg.decode())
-            self.publish(name + "/return", json.dumps({"ret": callback(**args)}))
+            self.publish(name + "/return", json.dumps({"ret": callback(**args)}), qos=2, retain=False)
         self.subscribers.append({"topic": name, "callback": cb})
 
     def call(self, callback):
@@ -76,7 +76,7 @@ class Client(mqtt.Client):
                 callback(**args)
                 self.unsubscribe(name)
 
-            self.publish(name, json.dumps(args))
+            self.publish(name, json.dumps(args), qos=2, retain=False)
         return call_method
 
     def on_terminate(self, signum, frame):
