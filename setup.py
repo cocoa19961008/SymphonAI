@@ -15,4 +15,12 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
+    zip_safe = False,
+    package_data={
+        'envs': ['*'],
+        'mosquitto': ['*'],
+        'nginx': ['*'],
+        'sympy': ['*'],
+        'template': ['*'],
+    },
 )
