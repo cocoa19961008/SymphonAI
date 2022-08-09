@@ -1,7 +1,7 @@
 import setuptools
 
 setuptools.setup(
-    name='symphonai',  
+    name='symphonai',
     version='0.1',
     scripts=['sym'],
     author="Sven Schultze",
@@ -9,18 +9,29 @@ setuptools.setup(
     description="A tool to build and run docker images",
     long_description="long_description",
     long_description_content_type="text/markdown",
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_namespace_packages(where="src"),
+    package_dir={"": "src"},
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
     zip_safe = False,
+    #package_data={
+    #    'symphonai/envs': ['*'],
+    #    'symphonai/mosquitto': ['*'],
+    #    'symphonai/nginx': ['*'],
+    #    'symphonai/sympy': ['*'],
+    #    'symphonai/template': ['*'],
+    #},
+    
     package_data={
-        'envs': ['*'],
-        'mosquitto': ['*'],
-        'nginx': ['*'],
-        'sympy': ['*'],
-        'template': ['*'],
-    },
+    	"symphonai": ["*"],
+    	"symphonai.mosquitto": ["*", "config/*"],
+    	"symphonai.nginx": ["*"],
+    	"symphonai.envs": ["*"],
+    	"symphonai.sympy": ["*"],
+    	"symphonai.template": ["*"]
+    }
 )
+

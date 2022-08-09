@@ -1,13 +1,13 @@
 import os
 
-symdir = "/".join(__file__.split("/")[:-2])
+symdir = "/".join(__file__.split("/")[:-1])
 currentdir = os.getcwd().split('/')[-1]
 
 def inject_sympy_dockerfile(tag):
     injection = [
         f"FROM {tag}",
         f"ADD sympy /root/sympy",
-        f"RUN pip3 install -e /root/sympy",
+        f"RUN pip3 install /root/sympy",
         f"WORKDIR /node/",
         f"ENV PYTHONUNBUFFERED 1",
     ]

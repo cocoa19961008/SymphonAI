@@ -15,6 +15,9 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        "paho-mqtt>=1.6.1"
+        "paho-mqtt>=1.6.1",
+        "bottle>=0.12.23",
+        "Paste>=3.5.1",
+        "requests>=2.28.1",
     ]
 )
