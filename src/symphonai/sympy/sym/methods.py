@@ -1,6 +1,11 @@
-from bottle import post, run, request
+from bottle import post, run, request, error
 import json
 import inspect
+import traceback
+
+@error(404)
+def error404(error):
+    return '{"error": "404 not found", "traceback": ""}'
 
 def get_signature(f):
     signature = inspect.signature(f)
@@ -21,11 +26,15 @@ class Methods():
         for name, f in self.methods.items():
             @post(f"/{name}")
             def method():
-                return json.dumps(f(**dict(request.json)))
+                response = dict(request.json)
+                try:
+                    return json.dumps(f(*response["args"], **response["kwargs"]))
+                except Exception as e:
+                    return json.dumps({"error": str(e), "traceback": traceback.format_exc()})
 
     def run(self):
         self._listen()
-        run(host="0.0.0.0", port=80, server='paste')
+        run(host="0.0.0.0", port=80, server='paste', quiet=True)
 
     def stop(self):
         pass#shutdown()

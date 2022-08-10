@@ -30,7 +30,7 @@ class Client(mqtt.Client):
         super().connect(self.host)
 
     def loop(self, block=True):
-        self.method_th = threading.Thread(target=self.methods.run)
+        self.method_th = threading.Thread(target=self.methods.run).start()
         self.connect()
         if block:
             super().loop_forever()
@@ -70,9 +70,19 @@ class Client(mqtt.Client):
         #self.subscribers.append({"topic": name, "callback": cb})
 
     def call(self, target, name):
-        def call_method(**args):
-            response = requests.post(f"http://{target}/{name}", json=args)
-            return response.json()
+        def call_method(*args, **kwargs):
+            msg = {
+                "args": args,
+                "kwargs": kwargs
+            }
+            response = requests.post(f"http://{target}/{name}", json=msg).json()
+            if type(response) is dict:
+                if "error" in response:
+                    print(response["traceback"])
+                    list_of_kwarg_pairs = [f"{k}={v}" for k, v in kwargs.items()]
+                    list_of_args = [str(a) for a in args]
+                    raise Exception(f"Exception on call {name}({', '.join(list_of_args + list_of_kwarg_pairs)}) on {target}: {response['error']}")
+            return response
         return call_method
 
     def on_terminate(self, signum, frame):
