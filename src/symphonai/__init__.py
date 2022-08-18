@@ -60,6 +60,7 @@ def build(args):
             "networks": [currentdir],
             "depends_on": ["mosquitto"],
             "env_file": [f"{os.getcwd()}/global.env", f"{os.getcwd()}/src/{pkg}/params.env"],
+            "extra_hosts": [f"symhost:host-gateway"],
         })
 
     services["mosquitto"] = {
