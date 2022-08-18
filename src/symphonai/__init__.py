@@ -9,7 +9,7 @@ symdir = "/".join(__file__.split("/")[:-1])
 currentdir = os.getcwd().split('/')[-1]
 
 def setup(args):
-    os.makedirs(".sym", exist_ok=True)
+    os.makedirs(".sym/mosquitto", exist_ok=True)
     os.makedirs("env", exist_ok=True)
     os.makedirs("src", exist_ok=True)
 
@@ -17,6 +17,8 @@ def setup(args):
     with open(".sym/mosquitto/pwd.txt", "w") as f:
         password = uuid.uuid4().hex
         print(password, file=f)
+
+    shutil.copy(f"{symdir}/mosquitto/config/mosquitto.conf", ".sym/mosquitto/mosquitto.conf")
 
     docker.build_mosquitto()
     docker.build_nginx()

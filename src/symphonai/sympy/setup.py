@@ -19,5 +19,7 @@ setuptools.setup(
         "bottle>=0.12.23",
         "Paste>=3.5.1",
         "requests>=2.28.1",
+        "tornado",
+        "asyncio"
     ]
 )

@@ -6,6 +6,7 @@ import json
 import sys
 import requests
 import threading
+import time
 
 class Client(mqtt.Client):
     def __init__(self, name=f"sym-{uuid.uuid4().hex}"):
@@ -14,8 +15,10 @@ class Client(mqtt.Client):
         #self.username_pw_set(username, password)
         self.subscribers = []
         self.methods = methods.Methods()
+        self.calls = dict()
         self.syncs = dict()
         signal.signal(signal.SIGTERM, self.on_terminate)
+        signal.signal(signal.SIGHUP, self.on_terminate)
 
     def on_connect(self, client, userdata, flags, rc):
         print("Connected")
@@ -30,8 +33,13 @@ class Client(mqtt.Client):
         super().connect(self.host)
 
     def loop(self, block=True):
-        self.method_th = threading.Thread(target=self.methods.run).start()
+        #self.methods.run()
+        self.method_th = threading.Thread(target=self.methods.run)
+        self.method_th.start()
+        #self.methods.run()
         self.connect()
+        for call in self.calls.values():
+            call.enable()
         if block:
             super().loop_forever()
         else:
@@ -69,21 +77,23 @@ class Client(mqtt.Client):
         #    self.publish(name + "/return", json.dumps({"ret": callback(**args)}), qos=2, retain=False)
         #self.subscribers.append({"topic": name, "callback": cb})
 
+    def _wait_for_method(self, target, name):
+        waiting_for_method = True
+        try_num = 0
+        while waiting_for_method:
+            try_num += 1
+            try:
+                response = requests.options(f"http://{target}/{name}")
+                return True
+            except Exception as e:
+                time.sleep(1)
+                print(f"Waiting for method {name} on {target}. Try #{try_num}")
+            if try_num >= 30:
+                return False
+
     def call(self, target, name):
-        def call_method(*args, **kwargs):
-            msg = {
-                "args": args,
-                "kwargs": kwargs
-            }
-            response = requests.post(f"http://{target}/{name}", json=msg).json()
-            if type(response) is dict:
-                if "error" in response:
-                    print(response["traceback"])
-                    list_of_kwarg_pairs = [f"{k}={v}" for k, v in kwargs.items()]
-                    list_of_args = [str(a) for a in args]
-                    raise Exception(f"Exception on call {name}({', '.join(list_of_args + list_of_kwarg_pairs)}) on {target}: {response['error']}")
-            return response
-        return call_method
+        self.calls[name] = methods.Call(target, name)
+        return self.calls[name]
 
     def on_terminate(self, signum, frame):
         print("Terminating")
