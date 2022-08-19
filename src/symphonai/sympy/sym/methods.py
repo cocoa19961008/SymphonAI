@@ -14,7 +14,10 @@ def get_signature(f):
     signature = inspect.signature(f)
     method = dict()
     for name, param in signature.parameters.items():
-        method[name] = param.default
+        if param.default != inspect.Parameter.empty:
+            method[name] = param.default
+        else:
+            method[name] = None
 
     return method
 
