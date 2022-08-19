@@ -7,6 +7,7 @@ import sys
 import requests
 import threading
 import time
+import os
 
 class Client(mqtt.Client):
     def __init__(self, name=f"sym-{uuid.uuid4().hex}"):
@@ -101,3 +102,6 @@ class Client(mqtt.Client):
         self.disconnect()
         self.methods.stop()
         sys.exit(0)
+
+    def __getitem__(self, varname):
+        return os.getenv(varname)
