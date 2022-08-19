@@ -74,18 +74,19 @@ class Call:
             try_num += 1
             try:
                 response = requests.options(f"http://{self.target}/{self.name}")
-                return True
+                return True, response.json()
             except Exception as e:
                 time.sleep(1)
                 print(f"Waiting for method {self.name} on {self.target}. Try #{try_num}")
             if try_num >= 30:
-                return False
+                return False, None
 
     def enable(self):
         print("Enabling call", self.name, "on", self.target)
-        if not self._wait_for_method():
+        enabled, signature = self._wait_for_method()
+        if not enabled:
             raise RuntimeError("Failed to enable call", self.name, "on", self.target)
-        print("Enabled call", self.name, "on", self.target)
+        print(f"Enabled call {self.name} on {self.target}: {signature}")
         self.enabled = True
 
     def __call__(self, *args, **kwargs):
