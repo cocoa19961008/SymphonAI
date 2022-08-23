@@ -104,4 +104,7 @@ class Client(mqtt.Client):
         sys.exit(0)
 
     def __getitem__(self, varname):
-        return os.getenv(varname)
+        try:
+            return json.loads(os.getenv(varname))
+        except:
+            return os.getenv(varname)
