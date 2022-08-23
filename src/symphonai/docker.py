@@ -17,7 +17,7 @@ def inject_sympy_dockerfile(tag):
 def build(dockerfile):
     tag = f"sym/{currentdir}:{dockerfile}"
     print(f"Building {tag}")
-    os.system(f"docker build -q -t {tag} -f env/{dockerfile} {symdir}")
+    os.system(f"docker build -q -t {tag} -f env/{dockerfile} {currentdir}")
     inject_sympy_dockerfile(tag)
 
 def build_mosquitto():
