@@ -9,19 +9,11 @@ symdir = "/".join(__file__.split("/")[:-1])
 currentdir = os.getcwd().split('/')[-1]
 
 def setup(args):
-    os.makedirs(".sym/mosquitto", exist_ok=True)
     os.makedirs("env", exist_ok=True)
     os.makedirs("src", exist_ok=True)
+    os.makedirs(".sym", exist_ok=True)
 
     open("global.env", "w").close()
-    with open(".sym/mosquitto/pwd.txt", "w") as f:
-        password = uuid.uuid4().hex
-        print(password, file=f)
-
-    shutil.copy(f"{symdir}/mosquitto/config/mosquitto.conf", ".sym/mosquitto/mosquitto.conf")
-
-    docker.build_mosquitto()
-    docker.build_nginx()
 
 def create(args):
     print("Creating package", args.name, "with env", args.env)
@@ -58,16 +50,10 @@ def build(args):
             "image": f"sym/{currentdir}:{config['env']}",
             "volumes": [f"{os.getcwd()}/src/{pkg}:/node", f"{os.getcwd()}/.sym/mosquitto/pwd.txt:/root/sympy/pwd.txt"],
             "networks": [currentdir],
-            "depends_on": ["mosquitto"],
             "env_file": [f"{os.getcwd()}/global.env", f"{os.getcwd()}/src/{pkg}/params.env"],
+            "environment": [f"SYMNAME={pkg}", "PYTHONPYCACHEPREFIX=../pycache"],
             "extra_hosts": [f"symhost:host-gateway"],
         })
-
-    services["mosquitto"] = {
-        "image": "symphonai/mosquitto",
-        "networks": [currentdir],
-        "volumes": [f"{os.getcwd()}/.sym/mosquitto:/etc/mosquitto"],
-    }
 
     with open(".sym/docker-compose.yml", "w") as f:
         yaml.dump({
