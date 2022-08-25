@@ -1,7 +1,18 @@
 import os
 from sym.proto import get_protos
 
-sources = get_protos()
+import json
+def get_param(varname):
+    try:
+        return json.loads(os.getenv(varname))
+    except:
+        return os.getenv(varname)
+
+sources = dict()
+try:
+    sources = get_protos()
+except:
+    pass
 
 node_name = os.getenv("SYMNAME")
 
@@ -22,7 +33,10 @@ def method(servicer_name):
             raise NameError(f"Missing proto service definition for function {m.__name__}")
 
         def call(request, context):
-            return own_servicers[servicer_name]["methods"][m.__name__]["output"](*m(request))
+            kwargs = dict()
+            for field, value in request.ListFields():
+                kwargs[field.name] = value
+            return own_servicers[servicer_name]["methods"][m.__name__]["output"](**m(**kwargs))
         setattr(servicers[servicer_name], m.__name__, call)
         
         return m
@@ -39,7 +53,7 @@ def call(target, stub, method):
     if not method in sources[target]["stubs"][stub]["methods"]:
         raise NameError(f"Cannot find method {method} of {stub} on {target}")
 
-    def m(request):
+    def m(*args, **kwargs):
         if target not in channels:
             import grpc
 
@@ -53,7 +67,12 @@ def call(target, stub, method):
 
         with channels[target] as channel:
             s = sources[target]["stubs"][stub]["stub"](channel)
-            return getattr(s, method)(request)
+            result =  getattr(s, method)(sources[target]["stubs"][stub]["methods"][method]["input"](*args, **kwargs))
+
+            ret = dict()
+            for field, value in result.ListFields():
+                ret[field.name] = value
+            return ret
 
     return m
 
