@@ -88,3 +88,9 @@ while True:
 ```bash
 sym run
 ```
+# Generating Documentation
+To generate documentation for all .proto files, run:
+```bash
+sym docs
+```
+This will create documentation html files in mypackage/docs/*nodename*
