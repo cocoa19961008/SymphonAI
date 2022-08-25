@@ -23,5 +23,8 @@ parser_build.set_defaults(func=symphonai.build)
 parser_run = subparsers.add_parser("run")
 parser_run.set_defaults(func=symphonai.run)
 
+parser_run = subparsers.add_parser("docs")
+parser_run.set_defaults(func=symphonai.docs)
+
 args = parser.parse_args()
 args.func(args)

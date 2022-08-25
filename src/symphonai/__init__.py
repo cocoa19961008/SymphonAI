@@ -3,7 +3,7 @@ from symphonai import docker
 import shutil
 import json
 import yaml
-import uuid
+from glob import glob
 
 symdir = "/".join(__file__.split("/")[:-1])
 currentdir = os.getcwd().split('/')[-1]
@@ -69,3 +69,9 @@ def build(args):
 
 def run(args): 
     os.system("docker compose -f .sym/docker-compose.yml up --remove-orphans")
+
+def docs(args):
+    for pkg in os.listdir("src"):
+        print(f"Generating docs for {pkg}.")
+        if len(glob(f"src/{pkg}/proto/*.proto")) > 0:
+            os.system(f'docker run --rm -v {os.getcwd()}/docs/{pkg}:/out -v {os.getcwd()}/src/{pkg}/proto:/protos pseudomuto/protoc-gen-doc')
