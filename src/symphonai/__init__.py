@@ -13,7 +13,8 @@ def setup(args):
     os.makedirs("src", exist_ok=True)
     os.makedirs(".sym", exist_ok=True)
 
-    open("global.env", "w").close()
+    if os.path.exists("global.env"):
+        open("global.env", "w").close()
 
 def create(args):
     print("Creating package", args.name, "with env", args.env)
