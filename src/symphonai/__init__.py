@@ -11,6 +11,7 @@ currentdir = os.getcwd().split('/')[-1]
 def setup(args):
     os.makedirs("env", exist_ok=True)
     os.makedirs("src", exist_ok=True)
+    os.makedirs("protos", exist_ok=True)
     os.makedirs(".sym", exist_ok=True)
 
     if os.path.exists("global.env"):
@@ -49,7 +50,7 @@ def build(args):
         services[pkg] = config["options"]
         services[pkg].update({
             "image": f"sym/{currentdir}:{config['env']}",
-            "volumes": [f"{os.getcwd()}/src/{pkg}:/node", f"{os.getcwd()}/.sym/mosquitto/pwd.txt:/root/sympy/pwd.txt"],
+            "volumes": [f"{os.getcwd()}/protos:/node/protos", f"{os.getcwd()}/src/{pkg}:/node"],
             "networks": [currentdir],
             "env_file": [f"{os.getcwd()}/global.env", f"{os.getcwd()}/src/{pkg}/params.env"],
             "environment": [f"SYMNAME={pkg}", "PYTHONPYCACHEPREFIX=../pycache"],
@@ -67,11 +68,16 @@ def build(args):
             }
         }, f)
 
-def run(args): 
-    os.system("docker compose -f .sym/docker-compose.yml up --remove-orphans")
+def run(args):
+    if args.profile:
+        os.system(f"docker-compose -f .sym/docker-compose.yml --profile {args.profile} up --remove-orphans")
+    else:
+        os.system("docker compose -f .sym/docker-compose.yml up --remove-orphans")
+
+def stop(args):
+    os.system("docker compose -f .sym/docker-compose.yml down")
 
 def docs(args):
-    for pkg in os.listdir("src"):
-        print(f"Generating docs for {pkg}.")
-        if len(glob(f"src/{pkg}/proto/*.proto")) > 0:
-            os.system(f'docker run --rm -v {os.getcwd()}/docs/{pkg}:/out -v {os.getcwd()}/src/{pkg}/proto:/protos pseudomuto/protoc-gen-doc')
+    for proto in glob(f"protos/*.proto"):
+        package = proto.split("/")[-1].split(".")[0]
+        os.system(f'docker run --rm -v {os.getcwd()}/docs:/out -v {os.getcwd()}/protos:/protos/protos pseudomuto/protoc-gen-doc */{package}.proto -I / --doc_opt=markdown,{package}.md')

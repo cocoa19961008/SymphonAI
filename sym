@@ -21,7 +21,11 @@ parser_build = subparsers.add_parser("build")
 parser_build.set_defaults(func=symphonai.build)
 
 parser_run = subparsers.add_parser("run")
+parser_run.add_argument("profile", help="eg. debug", default=None, nargs="?")
 parser_run.set_defaults(func=symphonai.run)
+
+parser_run = subparsers.add_parser("stop")
+parser_run.set_defaults(func=symphonai.stop)
 
 parser_run = subparsers.add_parser("docs")
 parser_run.set_defaults(func=symphonai.docs)
