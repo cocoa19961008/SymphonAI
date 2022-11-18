@@ -70,7 +70,7 @@ def build(args):
 
 def run(args):
     if args.profile:
-        os.system(f"docker-compose -f .sym/docker-compose.yml --profile {args.profile} up --remove-orphans")
+        os.system(f"docker compose -f .sym/docker-compose.yml --profile {args.profile} up --remove-orphans")
     else:
         os.system("docker compose -f .sym/docker-compose.yml up --remove-orphans")
 
