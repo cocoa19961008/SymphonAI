@@ -32,6 +32,9 @@ setuptools.setup(
     	"symphonai.envs": ["*"],
     	"symphonai.sympy": ["*"],
     	"symphonai.template": ["*"]
-    }
+    },
+    install_requires=[
+        'pyyaml'
+    ]
 )
 

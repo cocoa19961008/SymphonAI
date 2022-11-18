@@ -14,7 +14,7 @@ def setup(args):
     os.makedirs("protos", exist_ok=True)
     os.makedirs(".sym", exist_ok=True)
 
-    if os.path.exists("global.env"):
+    if not os.path.exists("global.env"):
         open("global.env", "w").close()
 
 def create(args):
