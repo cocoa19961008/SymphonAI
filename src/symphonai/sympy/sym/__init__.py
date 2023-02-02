@@ -9,7 +9,6 @@ def get_param(varname):
     except:
         return os.getenv(varname)
 
-
 import grpc
 import grpc.experimental
 def get_proto(package):
@@ -25,7 +24,8 @@ def handle_exceptions_here(func):
     def handler(self, request, context):
         try:
             return func(self, request, context)
-        except:
+        except Exception as e:
             traceback.print_exc()
-            context.abort(grpc.StatusCode.CANCELLED, "There was an exception")
+            
+            context.abort(grpc.StatusCode.CANCELLED, f"There was an exception in {type(self).__name__}: {type(e).__name__}")
     return handler
