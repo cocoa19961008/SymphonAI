@@ -28,4 +28,4 @@ def handle_exceptions_here(func):
         except:
             traceback.print_exc()
             context.abort(grpc.StatusCode.CANCELLED, "There was an exception")
-        return
+    return handler
