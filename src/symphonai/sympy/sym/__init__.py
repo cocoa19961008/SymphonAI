@@ -1,6 +1,8 @@
 import os
-
+import traceback
 import json
+import grpc
+
 def get_param(varname):
     try:
         return json.loads(os.getenv(varname))
@@ -18,3 +20,12 @@ def server():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     server.add_insecure_port('[::]:80')
     return server
+
+def handle_exceptions_here(func):
+    def handler(self, request, context):
+        try:
+            return func(self, request, context)
+        except:
+            traceback.print_exc()
+            context.abort(grpc.StatusCode.CANCELLED, "There was an exception")
+        return
