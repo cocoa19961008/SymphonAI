@@ -1,17 +1,7 @@
-FROM python:slim as builder
+FROM python:slim 
 
-RUN pip install grpcio-tools
-
-RUN mkdir /build
-COPY src /build
-WORKDIR /build
-RUN mkdir /protos
-RUN python -m grpc_tools.protoc -I. --python_out=/protos --grpc_python_out=/protos */*/*.proto
-
-FROM python:slim
-COPY --from=builder /protos /protos
 RUN pip install grpcio grpcio-tools
+
 WORKDIR /node
 ENV PYTHONUNBUFFERED 1
 CMD python3 node.py
-
