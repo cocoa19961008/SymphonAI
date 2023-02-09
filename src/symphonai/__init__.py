@@ -72,7 +72,7 @@ def run(args):
     if args.profile:
         os.system(f"docker compose -f .sym/docker-compose.yml --profile {args.profile} -p sym/{currentdir} up --remove-orphans")
     else:
-        os.system(f"docker compose -f .sym/docker-compose.yml -p sym/{currentdir} up --remove-orphans")
+        os.system(f"docker compose -f .sym/docker-compose.yml -p sym-{currentdir} up --remove-orphans")
 
 def stop(args):
     os.system("docker compose -f .sym/docker-compose.yml down")
