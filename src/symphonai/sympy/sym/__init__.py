@@ -15,8 +15,8 @@ def get_proto(package):
     return grpc.protos_and_services(f"protos/{package}.proto")
 
 from concurrent import futures
-def server():
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+def server(**kwargs):
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10), **kwargs)
     server.add_insecure_port('[::]:80')
     return server
 
