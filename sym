@@ -1,34 +1,6 @@
 #!/usr/bin/env python3
-import os
-import sys
-import tempfile
-import argparse
+import fire
+from symphonai import CLI
 
-import symphonai
-
-parser = argparse.ArgumentParser(description="Symphonai")
-subparsers = parser.add_subparsers()
-
-parser_setup = subparsers.add_parser("setup")
-parser_setup.set_defaults(func=symphonai.setup)
-
-parser_create = subparsers.add_parser("create")
-parser_create.add_argument("name", help="Name of the node")
-parser_create.add_argument("env", help="Env of the node")
-parser_create.set_defaults(func=symphonai.create)
-
-parser_build = subparsers.add_parser("build")
-parser_build.set_defaults(func=symphonai.build)
-
-parser_run = subparsers.add_parser("run")
-parser_run.add_argument("profile", help="eg. debug", default=None, nargs="?")
-parser_run.set_defaults(func=symphonai.run)
-
-parser_run = subparsers.add_parser("stop")
-parser_run.set_defaults(func=symphonai.stop)
-
-parser_run = subparsers.add_parser("docs")
-parser_run.set_defaults(func=symphonai.docs)
-
-args = parser.parse_args()
-args.func(args)
+if __name__ == "__main__":
+    fire.Fire(CLI)

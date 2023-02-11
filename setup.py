@@ -34,7 +34,8 @@ setuptools.setup(
     	"symphonai.template": ["*"]
     },
     install_requires=[
-        'pyyaml'
+        'pyyaml',
+        'fire'
     ]
 )
 
