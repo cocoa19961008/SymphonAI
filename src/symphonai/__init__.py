@@ -9,7 +9,13 @@ symdir = "/".join(__file__.split("/")[:-1])
 currentdir = os.getcwd().split('/')[-1]
 
 class CLI:
+    """
+    A tool to build and run dockerized nodes connected with gRPC in a clear project structure.
+    """
     def setup(self):
+        """
+        Setup project structure
+        """
         os.makedirs("env", exist_ok=True)
         os.makedirs("src", exist_ok=True)
         os.makedirs("protos", exist_ok=True)
@@ -19,6 +25,9 @@ class CLI:
             open("global.env", "w").close()
 
     def create(self, name, env):
+        """
+        Create a new package with name <name> and dockerfile <env>
+        """
         print("Creating package", name, "with env", env)
 
         pkg_dir = f"src/{name}"
@@ -39,6 +48,9 @@ class CLI:
             }, f, indent=4)
 
     def build(self):
+        """
+        Build all docker images and create docker-compose.yml
+        """
         for dockerfile in os.listdir("env"):
             docker.build(dockerfile)
 
@@ -70,15 +82,24 @@ class CLI:
             }, f)
 
     def run(self, profile=None):
+        """
+        Run the docker containers
+        """
         if profile:
             os.system(f"docker compose -f .sym/docker-compose.yml --profile {profile} -p sym/{currentdir} up --remove-orphans")
         else:
             os.system(f"docker compose -f .sym/docker-compose.yml -p sym-{currentdir} up --remove-orphans")
 
     def stop(self):
+        """
+        Stop the docker containers
+        """
         os.system("docker compose -f .sym/docker-compose.yml down")
 
     def docs(self):
+        """
+        Generate documentation for all protos
+        """
         for proto in glob(f"protos/*.proto"):
             package = proto.split("/")[-1].split(".")[0]
             os.system(f'docker run --rm -v {os.getcwd()}/docs:/out -v {os.getcwd()}/protos:/protos/protos pseudomuto/protoc-gen-doc */{package}.proto -I / --doc_opt=markdown,{package}.md')
