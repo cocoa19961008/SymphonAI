@@ -62,7 +62,7 @@ class CLI:
         for pkg, config in pkgs.items():
             services[pkg] = config["options"]
             services[pkg].update({
-                "image": f"sym/{currentdir}:{config['env']}",
+                "image": f"sym/{currentdir}.{config['env']}",
                 "volumes": [f"{os.getcwd()}/protos:/node/protos", f"{os.getcwd()}/src/{pkg}:/node"],
                 "networks": [currentdir],
                 "env_file": [f"{os.getcwd()}/global.env", f"{os.getcwd()}/src/{pkg}/params.env"],
@@ -103,3 +103,36 @@ class CLI:
         for proto in glob(f"protos/*.proto"):
             package = proto.split("/")[-1].split(".")[0]
             os.system(f'docker run --rm -v {os.getcwd()}/docs:/out -v {os.getcwd()}/protos:/protos/protos pseudomuto/protoc-gen-doc */{package}.proto -I / --doc_opt=markdown,{package}.md')
+
+    def commit(self, registry, tag="latest"):
+        """
+        Build the docker images with code for linux/arm64 and linux/amd64
+        """
+        platforms = ["linux/arm64", "linux/amd64"]
+        # check if docker buildx platforms are installed
+        if "linux/arm64" not in os.popen("docker buildx inspect").read():
+            print("Please install docker buildx for linux/arm64. ")
+            print("Run <docker run --privileged --rm tonistiigi/binfmt --install all> to install emulators on your system.")
+            print("Then, run <docker buildx create --use --name sym> to create a builder instance.")
+            print("Finally, run <docker buildx inspect --bootstrap> to install the platforms on your system.")
+            return
+        
+        if "linux/amd64" not in os.popen("docker buildx inspect").read():
+            print("platform linux/amd64 is not available on your system. Only building for linux/arm64")
+            platforms = ["linux/arm64"]
+        
+        envs = {}
+        for dockerfile in os.listdir("env"):
+            envtag = docker.build_on_platform(dockerfile, platforms)
+            envs[dockerfile] = envtag
+        
+        pkgs = {}
+        for pkg in os.listdir("src"):
+            pkgs[pkg] = json.load(open(f"src/{pkg}/config.json"))
+            
+        for pkg, config in pkgs.items():
+            image = envs[config["env"]]
+            docker.build_node_image(image, pkg, tag, platforms)
+        
+        
+        
