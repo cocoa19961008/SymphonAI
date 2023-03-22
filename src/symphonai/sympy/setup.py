@@ -1,7 +1,7 @@
 import setuptools
 
 setuptools.setup(
-    name='sympy',  
+    name='symphonaipy',  
     version='0.2',
     author="Sven Schultze",
     author_email="schultze.sven@googlemail.com",
