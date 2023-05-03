@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name='symphonai',
-    version='0.2.2',
+    version='0.2.3',
     scripts=['sym'],
     author="Sven Schultze",
     author_email="schultze.sven@googlemail.com",
