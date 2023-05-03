@@ -106,7 +106,7 @@ class CLI:
         containers = " ".join(containers)
         cmd = f"docker compose -f .sym/docker-compose.yml -p sym-{currentdir} logs {containers} --tail {tail}"
         if follow:
-            cmd += "--follow"
+            cmd += " --follow"
         print(cmd)
         os.system(cmd)
 
