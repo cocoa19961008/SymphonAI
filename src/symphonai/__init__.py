@@ -4,6 +4,7 @@ import shutil
 import json
 import yaml
 from glob import glob
+import subprocess
 
 symdir = "/".join(__file__.split("/")[:-1])
 currentdir = os.getcwd().split('/')[-1]
@@ -97,12 +98,17 @@ class CLI:
         os.system("docker compose -f .sym/docker-compose.yml down")
         
         
-    def logs(self, *containers):
+    def logs(self, *containers, follow=False, tail=100):
         """
         Stop the docker containers
         """
+        
         containers = " ".join(containers)
-        os.system(f"docker compose -f .sym/docker-compose.yml logs {containers} --tail 500")
+        cmd = f"docker compose -f .sym/docker-compose.yml logs {containers} --tail {tail}"
+        if follow:
+            cmd += "--follow"
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+        p.wait()
 
     def docs(self):
         """
