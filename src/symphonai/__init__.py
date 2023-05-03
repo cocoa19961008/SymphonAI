@@ -95,7 +95,7 @@ class CLI:
         """
         Stop the docker containers
         """
-        os.system("docker compose -f .sym/docker-compose.yml -p sym-{currentdir} down")
+        os.system(f"docker compose -f .sym/docker-compose.yml -p sym-{currentdir} down")
         
         
     def logs(self, *containers, follow=False, tail=100):
@@ -107,6 +107,7 @@ class CLI:
         cmd = f"docker compose -f .sym/docker-compose.yml -p sym-{currentdir} logs {containers} --tail {tail}"
         if follow:
             cmd += "--follow"
+        print(cmd)
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
         p.wait()
 
