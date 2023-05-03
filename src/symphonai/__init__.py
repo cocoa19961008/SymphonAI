@@ -107,9 +107,7 @@ class CLI:
         cmd = f"docker compose -f .sym/docker-compose.yml -p sym-{currentdir} logs {containers} --tail {tail}"
         if follow:
             cmd += "--follow"
-        print(cmd)
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
-        p.wait()
+        os.system(cmd)
 
     def docs(self):
         """
