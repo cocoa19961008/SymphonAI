@@ -1,13 +1,16 @@
 import setuptools
 
+with open("README.md", "r") as f:
+    long_description = f.read()
+
 setuptools.setup(
     name='symphonai',
     version='0.2.3',
     scripts=['sym'],
     author="Sven Schultze",
     author_email="schultze.sven@googlemail.com",
-    description="A tool to build and run docker images",
-    long_description="long_description",
+    description="A tool to build and run docker images together",
+    long_description=long_description,
     long_description_content_type="text/markdown",
     packages=setuptools.find_namespace_packages(where="src"),
     package_dir={"": "src"},
