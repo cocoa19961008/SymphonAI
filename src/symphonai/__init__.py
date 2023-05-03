@@ -102,7 +102,7 @@ class CLI:
         Stop the docker containers
         """
         containers = " ".join(containers)
-        os.system(f"docker compose -f .sym/docker-compose.yml logs {containers} --follow --tail 500")
+        os.system(f"docker compose -f .sym/docker-compose.yml logs {containers} --tail 500")
 
     def docs(self):
         """
