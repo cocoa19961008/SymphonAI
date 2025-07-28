@@ -1,5 +1,6 @@
 <img src="docs/banner.png">
 
+
 # SymphonAI
 SymphonAI is a container intercommunication framework based on gRPC and docker compose that makes it easy to orchestrate AI pipelines or complex structures of multi-agent systems.
 
